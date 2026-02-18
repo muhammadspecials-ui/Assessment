@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Recruiter Dashboard · AE Assessment</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --white:#ffffff;--off:#f7f7f6;--off2:#f0efed;--off3:#e8e6e2;
+      --border:#e3e1dc;--border2:#ccc9c2;
+      --text:#1a1917;--text2:#4a4845;--muted:#908e8a;--muted2:#bbb9b5;
+      --accent:#1a56db;--accent-light:#e8f0fe;
+      --good:#16a34a;--good-bg:#dcfce7;
+      --maybe:#b45309;--maybe-bg:#fef3c7;
+      --bad:#dc2626;--bad-bg:#fee2e2;
+      --serif:'Instrument Serif',Georgia,serif;
+      --sans:'Geist',system-ui,sans-serif;
+      --mono:'Geist Mono',monospace;
+      --sidebar:420px;
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    html{font-size:14px;}
+    body{font-family:var(--sans);background:var(--off);color:var(--text);min-height:100vh;-webkit-font-smoothing:antialiased;}
+    ::-webkit-scrollbar{width:5px;height:5px;}
+    ::-webkit-scrollbar-track{background:transparent;}
+    ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:99px;}
+
+    #app{display:flex;flex-direction:column;height:100vh;overflow:hidden;}
+
+    /* TOPBAR */
+    .topbar{background:var(--white);border-bottom:1px solid var(--border);padding:0 24px;height:54px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;z-index:30;}
+    .brand{display:flex;align-items:center;gap:9px;}
+    .brand-icon{width:28px;height:28px;background:var(--text);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:13px;}
+    .brand-name{font-family:var(--serif);font-size:17px;letter-spacing:-0.2px;}
+    .brand-sep{color:var(--border2);margin:0 2px;}
+    .brand-tag{font-size:12px;color:var(--muted);}
+    .topbar-right{display:flex;align-items:center;gap:10px;}
+    .live-pill{display:flex;align-items:center;gap:5px;font-size:11.5px;color:var(--muted);background:var(--off2);border:1px solid var(--border);border-radius:20px;padding:3px 10px;}
+    .live-pip{width:6px;height:6px;background:var(--good);border-radius:50%;animation:blink 2s ease-in-out infinite;}
+    @keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
+    .stat-pills{display:flex;gap:5px;}
+    .stat-pill{background:var(--off2);border:1px solid var(--border);border-radius:5px;padding:3px 9px;font-size:12px;font-weight:500;color:var(--text2);display:flex;align-items:center;gap:4px;}
+    .stat-pill strong{font-weight:700;}
+    .pill-good strong{color:var(--good);}.pill-maybe strong{color:var(--maybe);}.pill-bad strong{color:var(--bad);}
+    .btn-icon{background:var(--white);border:1px solid var(--border);border-radius:7px;padding:5px 12px;font-family:var(--sans);font-size:12px;font-weight:500;color:var(--text2);cursor:pointer;display:flex;align-items:center;gap:6px;transition:all .13s;text-decoration:none;white-space:nowrap;}
+    .btn-icon:hover{background:var(--off2);color:var(--text);border-color:var(--border2);}
+    .btn-icon.accent{background:var(--accent);border-color:var(--accent);color:#fff;}
+    .btn-icon.accent:hover{opacity:.87;}
+    .btn-icon.spinning svg{animation:spin .6s linear infinite;}
+    @keyframes spin{to{transform:rotate(360deg)}}
+
+    /* TOOLBAR */
+    .toolbar{background:var(--white);border-bottom:1px solid var(--border);padding:10px 24px;display:flex;align-items:center;gap:8px;flex-shrink:0;flex-wrap:wrap;}
+    .search-wrap{position:relative;flex:1;min-width:180px;max-width:280px;}
+    .search-wrap svg{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--muted);pointer-events:none;}
+    .search-wrap input{width:100%;background:var(--off);border:1px solid var(--border);border-radius:7px;padding:7px 10px 7px 32px;font-family:var(--sans);font-size:13px;color:var(--text);outline:none;transition:all .13s;}
+    .search-wrap input::placeholder{color:var(--muted2);}
+    .search-wrap input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(26,86,219,.09);background:var(--white);}
+    .filters{display:flex;gap:4px;}
+    .chip{background:var(--white);border:1px solid var(--border);border-radius:6px;padding:5px 11px;font-size:12px;font-weight:500;color:var(--text2);cursor:pointer;transition:all .12s;white-space:nowrap;}
+    .chip:hover{background:var(--off2);border-color:var(--border2);}
+    .chip.active{background:var(--text);border-color:var(--text);color:#fff;}
+    .chip.active.cg{background:var(--good);border-color:var(--good);}
+    .chip.active.cm{background:var(--maybe);border-color:var(--maybe);}
+    .chip.active.cb{background:var(--bad);border-color:var(--bad);}
+    .spacer{flex:1;}
+
+    /* CONTENT */
+    .content{display:flex;flex:1;overflow:hidden;}
+
+    /* TABLE */
+    .table-wrap{flex:1;overflow:auto;min-width:0;}
+    table{width:100%;border-collapse:collapse;min-width:680px;}
+    thead th{background:var(--white);border-bottom:1px solid var(--border);padding:10px 16px;text-align:left;font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);position:sticky;top:0;z-index:5;white-space:nowrap;cursor:pointer;user-select:none;transition:color .12s;}
+    thead th:hover{color:var(--text2);}
+    tbody tr{border-bottom:1px solid var(--border);cursor:pointer;transition:background .1s;animation:rowIn .25s ease both;}
+    @keyframes rowIn{from{opacity:0;transform:translateY(3px)}to{opacity:1;transform:translateY(0)}}
+    tbody tr:hover{background:var(--off);}
+    tbody tr.sel{background:var(--accent-light)!important;}
+    tbody tr:last-child{border-bottom:none;}
+    td{padding:11px 16px;font-size:13px;vertical-align:middle;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+    .td-av{width:44px;padding-right:6px;}
+    .avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--off3),var(--border2));display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-size:13px;color:var(--text2);border:1.5px solid var(--border);}
+    .n-main{font-weight:600;font-size:13px;}
+    .n-sub{font-size:11px;color:var(--muted);margin-top:1px;}
+
+    .sbadge{display:inline-flex;align-items:center;gap:5px;border-radius:5px;padding:3px 9px;font-size:11.5px;font-weight:600;white-space:nowrap;}
+    .sbadge .d{width:6px;height:6px;border-radius:50%;}
+    .sbadge.good{background:var(--good-bg);color:var(--good);}.sbadge.good .d{background:var(--good);}
+    .sbadge.maybe{background:var(--maybe-bg);color:var(--maybe);}.sbadge.maybe .d{background:var(--maybe);}
+    .sbadge.bad{background:var(--bad-bg);color:var(--bad);}.sbadge.bad .d{background:var(--bad);}
+
+    .stbadge{display:inline-block;border-radius:4px;padding:2px 8px;font-size:10.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;}
+    .stbadge.New{background:#dbeafe;color:#1d4ed8;}
+    .stbadge.Reviewed{background:#ede9fe;color:#7c3aed;}
+    .stbadge.Shortlisted{background:var(--good-bg);color:var(--good);}
+    .stbadge.Rejected{background:var(--bad-bg);color:var(--bad);}
+
+    .minibar{width:52px;height:4px;background:var(--off3);border-radius:2px;overflow:hidden;}
+    .minifill{height:100%;border-radius:2px;}
+    .minifill.good{background:var(--good);}.minifill.maybe{background:var(--maybe);}.minifill.bad{background:var(--bad);}
+
+    .empty-row td{text-align:center;padding:64px 20px;color:var(--muted);}
+    .empty-icon{font-size:32px;margin-bottom:10px;}
+    .empty-ttl{font-family:var(--serif);font-size:18px;color:var(--text2);margin-bottom:4px;}
+    .loading-row{display:inline-flex;align-items:center;gap:8px;color:var(--muted);font-size:13px;}
+    .spinner{width:15px;height:15px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .6s linear infinite;}
+
+    /* DETAIL */
+    .detail-panel{width:var(--sidebar);flex-shrink:0;border-left:1px solid var(--border);background:var(--white);display:none;flex-direction:column;overflow:hidden;}
+    .detail-panel.open{display:flex;}
+    .d-scroll{overflow-y:auto;flex:1;}
+    .d-hdr{padding:18px 20px 14px;border-bottom:1px solid var(--border);background:var(--white);position:sticky;top:0;z-index:5;}
+    .d-hdr-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px;}
+    .d-av-lg{width:42px;height:42px;border-radius:10px;background:linear-gradient(135deg,var(--off3),var(--border2));display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-size:17px;color:var(--text2);border:1.5px solid var(--border);}
+    .d-close{background:none;border:1px solid var(--border);border-radius:6px;width:28px;height:28px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--muted);font-size:18px;line-height:1;transition:all .12s;}
+    .d-close:hover{background:var(--off2);color:var(--text);}
+    .d-name{font-family:var(--serif);font-size:20px;letter-spacing:-0.2px;margin-bottom:2px;}
+    .d-email{font-size:12px;color:var(--muted);}
+    .d-badges{display:flex;align-items:center;gap:6px;margin-top:8px;flex-wrap:wrap;}
+    .d-body{padding:16px 20px;}
+    .d-sec{margin-bottom:22px;}
+    .d-sec-t{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--border);}
+    .d-fld{margin-bottom:8px;}
+    .d-lbl{font-size:11px;color:var(--muted);margin-bottom:2px;}
+    .d-val{font-size:13px;color:var(--text);line-height:1.5;}
+
+    .score-meter{background:var(--off2);border:1px solid var(--border);border-radius:8px;padding:14px 16px;margin-bottom:14px;}
+    .score-num{font-family:var(--serif);font-size:38px;line-height:1;margin-bottom:8px;}
+    .score-num sup{font-size:15px;color:var(--muted);font-family:var(--sans);}
+    .score-num.good{color:var(--good);}.score-num.maybe{color:var(--maybe);}.score-num.bad{color:var(--bad);}
+    .score-track{height:6px;background:var(--border);border-radius:3px;overflow:hidden;margin-bottom:10px;}
+    .score-fill{height:100%;border-radius:3px;transition:width .7s cubic-bezier(.4,0,.2,1);}
+    .score-fill.good{background:var(--good);}.score-fill.maybe{background:var(--maybe);}.score-fill.bad{background:var(--bad);}
+    .reason-chips{display:flex;flex-wrap:wrap;gap:4px;}
+    .reason-chip{background:var(--white);border:1px solid var(--border);border-radius:4px;padding:2px 7px;font-size:11px;color:var(--text2);}
+
+    .tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:4px;}
+    .tag{background:var(--off2);border:1px solid var(--border);border-radius:4px;padding:2px 8px;font-size:11px;color:var(--text2);}
+    .tag.hl{background:var(--good-bg);border-color:#bbf7d0;color:var(--good);}
+    .tag.rf{background:var(--bad-bg);border-color:#fecaca;color:var(--bad);}
+
+    .resume-box{background:var(--off);border:1px solid var(--border);border-radius:7px;padding:12px;font-size:11.5px;line-height:1.65;color:var(--text2);max-height:150px;overflow-y:auto;white-space:pre-wrap;word-break:break-word;font-family:var(--mono);}
+
+    .status-editor{background:var(--off);border:1px solid var(--border);border-radius:8px;padding:14px;}
+    .se-lbl{font-size:10.5px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;}
+    .status-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-bottom:12px;}
+    .s-opt{background:var(--white);border:1.5px solid var(--border);border-radius:7px;padding:8px;text-align:center;font-family:var(--sans);font-size:12px;font-weight:600;color:var(--text2);cursor:pointer;transition:all .12s;}
+    .s-opt:hover{border-color:var(--border2);}
+    .s-opt.sel-New{border-color:#1d4ed8;background:#dbeafe;color:#1d4ed8;}
+    .s-opt.sel-Reviewed{border-color:#7c3aed;background:#ede9fe;color:#7c3aed;}
+    .s-opt.sel-Shortlisted{border-color:var(--good);background:var(--good-bg);color:var(--good);}
+    .s-opt.sel-Rejected{border-color:var(--bad);background:var(--bad-bg);color:var(--bad);}
+    .notes-ta{width:100%;background:var(--white);border:1px solid var(--border);border-radius:7px;padding:8px 10px;font-family:var(--sans);font-size:12px;color:var(--text);resize:vertical;min-height:70px;outline:none;margin-bottom:10px;transition:all .13s;}
+    .notes-ta:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(26,86,219,.08);}
+    .btn-save{width:100%;background:var(--accent);border:none;border-radius:7px;padding:10px;font-family:var(--sans);font-size:13px;font-weight:600;color:#fff;cursor:pointer;transition:opacity .13s;}
+    .btn-save:hover{opacity:.87;}
+    .btn-save:disabled{opacity:.4;cursor:not-allowed;}
+    .save-fb{text-align:center;font-size:11px;margin-top:6px;min-height:14px;}
+    .save-fb.ok{color:var(--good);}.save-fb.err{color:var(--bad);}
+
+    #toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%) translateY(10px);background:var(--text);color:#fff;font-size:12.5px;font-weight:500;padding:9px 16px;border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,.18);opacity:0;pointer-events:none;transition:all .22s cubic-bezier(.4,0,.2,1);z-index:999;display:flex;align-items:center;gap:7px;}
+    #toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+    #toast.ok::before{content:'✓';color:#4ade80;}
+    #toast.err::before{content:'✗';color:#f87171;}
+
+    @media(max-width:780px){
+      :root{--sidebar:100vw;}
+      .detail-panel.open{position:fixed;inset:0;z-index:100;width:100vw;}
+      .stat-pills{display:none;}
+      td:nth-child(3),th:nth-child(3),td:nth-child(7),th:nth-child(7){display:none;}
+    }
+    @media(max-width:520px){
+      .brand-tag{display:none;}
+      .live-pill{display:none;}
+    }
+  </style>
+</head>
+<body>
+<div id="app">
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-icon">🎯</div>
+      <span class="brand-name">Recruitment Pipeline</span>
+      <span class="brand-sep">·</span>
+      <span class="brand-tag">AE Assessment</span>
+    </div>
+    <div class="topbar-right">
+      <div class="live-pill"><div class="live-pip"></div> Live</div>
+      <div class="stat-pills">
+        <div class="stat-pill"><strong id="s-total">—</strong>&thinsp;Total</div>
+        <div class="stat-pill pill-good"><strong id="s-good">—</strong>&thinsp;Good</div>
+        <div class="stat-pill pill-maybe"><strong id="s-maybe">—</strong>&thinsp;Maybe</div>
+        <div class="stat-pill pill-bad"><strong id="s-bad">—</strong>&thinsp;Not Fit</div>
+      </div>
+      <button class="btn-icon" id="rbtn" onclick="loadCandidates()">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+        Refresh
+      </button>
+      <a href="candidate-form.html" class="btn-icon accent">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Add Candidate
+      </a>
+    </div>
+  </header>
+
+  <div class="toolbar">
+    <div class="search-wrap">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input id="search" type="text" placeholder="Search name, email, location…" oninput="applyFilters()">
+    </div>
+    <div class="filters">
+      <button class="chip active" onclick="setFilter('all',this)">All</button>
+      <button class="chip" onclick="setFilter('Good Fit',this)">Good Fit</button>
+      <button class="chip" onclick="setFilter('Maybe',this)">Maybe</button>
+      <button class="chip" onclick="setFilter('Not Fit',this)">Not Fit</button>
+    </div>
+    <div class="spacer"></div>
+    <div style="font-size:12px;color:var(--muted)" id="result-count"></div>
+  </div>
+
+  <div class="content">
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th class="td-av"></th>
+            <th onclick="sortBy('name')">Name ↕</th>
+            <th onclick="sortBy('location')">Location</th>
+            <th onclick="sortBy('scoreLabel')">Score ↕</th>
+            <th>Score %</th>
+            <th onclick="sortBy('status')">Status ↕</th>
+            <th onclick="sortBy('seniority')">Seniority</th>
+            <th onclick="sortBy('dateSubmitted')">Date ↕</th>
+          </tr>
+        </thead>
+        <tbody id="tbody">
+          <tr class="empty-row"><td colspan="8"><div class="loading-row"><div class="spinner"></div>Loading candidates…</div></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <aside class="detail-panel" id="dpanel">
+      <div class="d-scroll">
+        <div class="d-hdr">
+          <div class="d-hdr-top">
+            <div class="d-av-lg" id="d-av">?</div>
+            <button class="d-close" onclick="closeDetail()">×</button>
+          </div>
+          <div class="d-name" id="d-name">—</div>
+          <div class="d-email" id="d-email">—</div>
+          <div class="d-badges" id="d-badges"></div>
+        </div>
+        <div class="d-body" id="d-body"></div>
+      </div>
+    </aside>
+  </div>
+</div>
+<div id="toast"></div>
+
+<script>
+const CFG={token:'patAhuOMJFhzDO0EG.22a0e3537181b8f539dd0d8ed386ee2b873bf703d63bf6e15eb664fc3900d215',baseId:'appbQoUvQTAIzZftB',tableId:'tbliOOrhD83eiWonI'};
+let all=[],filtered=[],activeFilter='all',sortField='dateSubmitted',sortAsc=false,selectedId=null,pendingStatus=null;
+const AT=`https://api.airtable.com/v0/${CFG.baseId}/${CFG.tableId}`;
+const AH={'Authorization':`Bearer ${CFG.token}`,'Content-Type':'application/json'};
+
+async function atReq(method,path='',body=null){
+  const r=await fetch(AT+path,{method,headers:AH,...(body?{body:JSON.stringify(body)}:{})});
+  if(!r.ok){const e=await r.json().catch(()=>({}));throw new Error(e.error?.message||`HTTP ${r.status}`);}
+  return r.json();
+}
+
+async function loadAllRecs(){
+  let recs=[],offset=null;
+  do{const qs=new URLSearchParams({pageSize:'100'});if(offset)qs.set('offset',offset);const d=await atReq('GET',`?${qs}`);recs=recs.concat(d.records||[]);offset=d.offset;}while(offset);
+  return recs;
+}
+
+async function loadCandidates(){
+  const btn=document.getElementById('rbtn');btn.classList.add('spinning');
+  document.getElementById('tbody').innerHTML=`<tr class="empty-row"><td colspan="8"><div class="loading-row"><div class="spinner"></div>Loading…</div></td></tr>`;
+  try{
+    const recs=await loadAllRecs();
+    all=recs.map(r=>({id:r.id,name:r.fields['Name']||'',email:r.fields['Email']||'',location:r.fields['Location']||'',resume:r.fields['Resume']||'',whatsapp:r.fields['WhatsApp']||'',dateSubmitted:r.fields['Date Submitted']||r.fields['Time Submitted']||'',scoreLabel:r.fields['Score']||'Maybe',scoreNumeric:r.fields['Score (Numeric)']||0,scoreReasons:r.fields['Score Reasons']||'',skills:r.fields['Skills']||'',seniority:r.fields['Seniority']||'',yearsExp:r.fields['Years Experience']||0,summary:r.fields['AI Summary']||'',highlights:r.fields['Highlights']||'',redFlags:r.fields['Red Flags']||'',status:r.fields['Status']||'New',notes:r.fields['Notes']||''}));
+    updateStats();applyFilters();toast(`Loaded ${all.length} candidate${all.length!==1?'s':''}`, 'ok');
+  }catch(e){
+    document.getElementById('tbody').innerHTML=`<tr class="empty-row"><td colspan="8" style="color:var(--bad)">⚠ ${esc(e.message)}</td></tr>`;
+    toast('Load failed: '+e.message,'err');
+  }finally{btn.classList.remove('spinning');}
+}
+
+function updateStats(){
+  document.getElementById('s-total').textContent=all.length;
+  document.getElementById('s-good').textContent=all.filter(c=>c.scoreLabel==='Good Fit').length;
+  document.getElementById('s-maybe').textContent=all.filter(c=>c.scoreLabel==='Maybe').length;
+  document.getElementById('s-bad').textContent=all.filter(c=>c.scoreLabel==='Not Fit').length;
+}
+
+function setFilter(f,btn){
+  activeFilter=f;
+  document.querySelectorAll('.chip').forEach(c=>c.classList.remove('active','cg','cm','cb'));
+  btn.classList.add('active');
+  if(f==='Good Fit')btn.classList.add('cg');if(f==='Maybe')btn.classList.add('cm');if(f==='Not Fit')btn.classList.add('cb');
+  applyFilters();
+}
+
+function applyFilters(){
+  const q=document.getElementById('search').value.toLowerCase().trim();
+  filtered=all.filter(c=>{
+    if(activeFilter!=='all'&&c.scoreLabel!==activeFilter)return false;
+    if(q){const h=[c.name,c.email,c.location,c.whatsapp,c.seniority].join(' ').toLowerCase();if(!h.includes(q))return false;}
+    return true;
+  });
+  filtered.sort((a,b)=>{let av=a[sortField]??'',bv=b[sortField]??'';if(typeof av==='string')av=av.toLowerCase();if(typeof bv==='string')bv=bv.toLowerCase();if(av<bv)return sortAsc?-1:1;if(av>bv)return sortAsc?1:-1;return 0;});
+  document.getElementById('result-count').textContent=filtered.length===all.length?`${all.length} candidates`:`${filtered.length} of ${all.length}`;
+  renderTable();
+}
+
+function sortBy(f){if(sortField===f)sortAsc=!sortAsc;else{sortField=f;sortAsc=true;}applyFilters();}
+
+function renderTable(){
+  const tbody=document.getElementById('tbody');
+  if(!filtered.length){
+    tbody.innerHTML=`<tr class="empty-row"><td colspan="8"><div class="empty-icon">🔍</div><div class="empty-ttl">No results found</div><div style="font-size:13px">Adjust search or filters · <a href="candidate-form.html" style="color:var(--accent)">Add a candidate →</a></div></td></tr>`;
+    return;
+  }
+  tbody.innerHTML=filtered.map((c,i)=>{
+    const sc=cls(c.scoreLabel);
+    const ini=c.name.split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase()||'?';
+    const date=c.dateSubmitted?new Date(c.dateSubmitted).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'2-digit'}):'—';
+    return `<tr class="${c.id===selectedId?'sel':''}" style="animation-delay:${Math.min(i*.025,.3)}s" onclick="openDetail('${c.id}')">
+      <td class="td-av"><div class="avatar">${esc(ini)}</div></td>
+      <td><div class="n-main">${esc(c.name)}</div><div class="n-sub">${esc(c.email)}</div></td>
+      <td style="color:var(--text2)">${esc(c.location)||'—'}</td>
+      <td><span class="sbadge ${sc}"><span class="d"></span>${esc(c.scoreLabel)}</span></td>
+      <td><div style="display:flex;align-items:center;gap:6px"><div class="minibar"><div class="minifill ${sc}" style="width:${c.scoreNumeric}%"></div></div><span style="font-size:11px;color:var(--muted)">${c.scoreNumeric}</span></div></td>
+      <td><span class="stbadge ${c.status}">${esc(c.status)}</span></td>
+      <td style="color:var(--text2)">${esc(c.seniority)||'—'}</td>
+      <td style="color:var(--muted);font-size:12px">${date}</td>
+    </tr>`;
+  }).join('');
+}
+
+function openDetail(id){
+  selectedId=id;pendingStatus=null;renderTable();
+  const c=all.find(x=>x.id===id);if(!c)return;
+  const sc=cls(c.scoreLabel);
+  const ini=c.name.split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase()||'?';
+  document.getElementById('d-av').textContent=ini;
+  document.getElementById('d-name').textContent=c.name;
+  document.getElementById('d-email').textContent=c.email;
+  document.getElementById('d-badges').innerHTML=`<span class="sbadge ${sc}"><span class="d"></span>${esc(c.scoreLabel)}</span><span class="stbadge ${c.status}">${esc(c.status)}</span>`;
+  const skills=split(c.skills,','),highlights=split(c.highlights,'|'),redFlags=split(c.redFlags,'|'),reasons=split(c.scoreReasons,',');
+  document.getElementById('d-body').innerHTML=`
+    <div class="d-sec"><div class="d-sec-t">Score</div>
+      <div class="score-meter">
+        <div class="score-num ${sc}">${c.scoreNumeric}<sup>/100</sup></div>
+        <div class="score-track"><div class="score-fill ${sc}" style="width:${c.scoreNumeric}%"></div></div>
+        ${reasons.length?`<div class="reason-chips">${reasons.map(r=>`<span class="reason-chip">${esc(r)}</span>`).join('')}</div>`:''}
+      </div>
+    </div>
+    <div class="d-sec"><div class="d-sec-t">AI Assessment</div>
+      ${c.summary?`<div class="d-fld"><div class="d-lbl">Summary</div><div class="d-val" style="color:var(--text2)">${esc(c.summary)}</div></div>`:''}
+      <div class="d-fld"><div class="d-lbl">Experience</div><div class="d-val">${c.yearsExp?c.yearsExp+' yr(s)':'Not specified'} · <strong>${esc(c.seniority)||'Unknown'}</strong></div></div>
+      ${skills.length?`<div class="d-fld"><div class="d-lbl">Skills</div><div class="tags">${skills.map(s=>`<span class="tag">${esc(s)}</span>`).join('')}</div></div>`:''}
+      ${highlights.length?`<div class="d-fld"><div class="d-lbl">Highlights</div><div class="tags">${highlights.map(h=>`<span class="tag hl">✓ ${esc(h)}</span>`).join('')}</div></div>`:''}
+      ${redFlags.length?`<div class="d-fld"><div class="d-lbl">Concerns</div><div class="tags">${redFlags.map(r=>`<span class="tag rf">⚠ ${esc(r)}</span>`).join('')}</div></div>`:''}
+    </div>
+    <div class="d-sec"><div class="d-sec-t">Contact</div>
+      <div class="d-fld"><div class="d-lbl">Email</div><div class="d-val">${esc(c.email)}</div></div>
+      <div class="d-fld"><div class="d-lbl">Location</div><div class="d-val">${esc(c.location)||'—'}</div></div>
+      ${c.whatsapp?`<div class="d-fld"><div class="d-lbl">WhatsApp</div><div class="d-val">${esc(c.whatsapp)}</div></div>`:''}
+      <div class="d-fld"><div class="d-lbl">Submitted</div><div class="d-val">${c.dateSubmitted?new Date(c.dateSubmitted).toLocaleString():'—'}</div></div>
+    </div>
+    ${c.resume?`<div class="d-sec"><div class="d-sec-t">Resume / Profile</div><div class="resume-box">${esc(c.resume)}</div></div>`:''}
+    <div class="d-sec"><div class="d-sec-t">Update Record</div>
+      <div class="status-editor">
+        <div class="se-lbl">Status</div>
+        <div class="status-grid">${['New','Reviewed','Shortlisted','Rejected'].map(s=>`<button class="s-opt ${c.status===s?'sel-'+s:''}" onclick="selStatus('${s}',this)">${s}</button>`).join('')}</div>
+        <div class="se-lbl">Notes</div>
+        <textarea class="notes-ta" id="edit-notes" placeholder="Add recruiter notes…">${esc(c.notes)}</textarea>
+        <button class="btn-save" id="save-btn" onclick="saveRecord('${c.id}')">Save Changes</button>
+        <div class="save-fb" id="save-fb"></div>
+      </div>
+    </div>`;
+  document.getElementById('dpanel').classList.add('open');
+}
+
+function closeDetail(){selectedId=null;document.getElementById('dpanel').classList.remove('open');renderTable();}
+
+function selStatus(s,btn){pendingStatus=s;document.querySelectorAll('.s-opt').forEach(b=>b.className='s-opt');btn.className=`s-opt sel-${s}`;}
+
+async function saveRecord(id){
+  const c=all.find(x=>x.id===id);if(!c)return;
+  const ns=pendingStatus||c.status,nn=document.getElementById('edit-notes').value;
+  const sb=document.getElementById('save-btn'),sf=document.getElementById('save-fb');
+  sb.disabled=true;sb.textContent='Saving…';sf.textContent='';sf.className='save-fb';
+  try{
+    await atReq('PATCH',`/${id}`,{fields:{'Status':ns,'Notes':nn}});
+    c.status=ns;c.notes=nn;pendingStatus=null;
+    sf.textContent='✓ Saved';sf.className='save-fb ok';
+    const sc=cls(c.scoreLabel);
+    document.getElementById('d-badges').innerHTML=`<span class="sbadge ${sc}"><span class="d"></span>${esc(c.scoreLabel)}</span><span class="stbadge ${ns}">${esc(ns)}</span>`;
+    renderTable();updateStats();toast('Record updated','ok');
+  }catch(e){sf.textContent='✗ '+e.message;sf.className='save-fb err';toast('Save failed: '+e.message,'err');}
+  finally{sb.disabled=false;sb.textContent='Save Changes';}
+}
+
+function cls(l){if(l==='Good Fit')return 'good';if(l==='Maybe')return 'maybe';return 'bad';}
+function split(v,s){return(v||'').split(s).map(x=>x.trim()).filter(Boolean);}
+function esc(s){return String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+let _tt;
+function toast(msg,type='ok'){
+  const t=document.getElementById('toast');t.textContent=msg;t.className=type;t.classList.add('show');
+  clearTimeout(_tt);_tt=setTimeout(()=>t.classList.remove('show'),3200);
+}
+
+loadCandidates();
+</script>
+</body>
+</html>

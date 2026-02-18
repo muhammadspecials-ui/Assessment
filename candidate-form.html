@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Apply — Recruitment Pipeline</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --white: #ffffff;
+      --off: #f7f7f6;
+      --off2: #f0efed;
+      --border: #e3e1dc;
+      --border2: #ccc9c2;
+      --text: #1a1917;
+      --text2: #4a4845;
+      --muted: #908e8a;
+      --accent: #1a56db;
+      --accent-hover: #1445b8;
+      --accent-light: #e8f0fe;
+      --good: #16a34a;
+      --bad: #dc2626;
+      --serif: 'Instrument Serif', Georgia, serif;
+      --sans: 'Geist', system-ui, sans-serif;
+      --mono: 'Geist Mono', monospace;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: 15px; }
+
+    body {
+      font-family: var(--sans);
+      background: var(--off);
+      color: var(--text);
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── PAGE LAYOUT ── */
+    .page {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── HEADER BAR ── */
+    .top-bar {
+      background: var(--white);
+      border-bottom: 1px solid var(--border);
+      padding: 0 32px;
+      height: 54px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      text-decoration: none;
+    }
+
+    .brand-icon {
+      width: 28px; height: 28px;
+      background: var(--text);
+      border-radius: 7px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      flex-shrink: 0;
+    }
+
+    .brand-name {
+      font-family: var(--serif);
+      font-size: 17px;
+      color: var(--text);
+      letter-spacing: -0.2px;
+    }
+
+    .top-bar-link {
+      font-size: 13px;
+      color: var(--muted);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      transition: color 0.15s;
+    }
+
+    .top-bar-link:hover { color: var(--accent); }
+
+    /* ── HERO ── */
+    .hero {
+      background: var(--white);
+      border-bottom: 1px solid var(--border);
+      padding: 52px 32px 44px;
+      text-align: center;
+    }
+
+    .hero-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--accent);
+      background: var(--accent-light);
+      border: 1px solid rgba(26,86,219,0.15);
+      border-radius: 20px;
+      padding: 4px 12px;
+      margin-bottom: 20px;
+    }
+
+    .hero-title {
+      font-family: var(--serif);
+      font-size: clamp(30px, 5vw, 44px);
+      line-height: 1.1;
+      letter-spacing: -0.5px;
+      color: var(--text);
+      margin-bottom: 14px;
+      max-width: 560px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .hero-title em {
+      font-style: italic;
+      color: var(--accent);
+    }
+
+    .hero-sub {
+      font-size: 15px;
+      color: var(--text2);
+      line-height: 1.65;
+      max-width: 480px;
+      margin: 0 auto;
+    }
+
+    /* ── FORM WRAPPER ── */
+    .form-wrapper {
+      flex: 1;
+      padding: 40px 20px 80px;
+      display: flex;
+      justify-content: center;
+    }
+
+    /* ── FORM CARD ── */
+    .form-card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 40px 44px;
+      width: 100%;
+      max-width: 660px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.04);
+      animation: cardIn 0.45s cubic-bezier(0.4,0,0.2,1) both;
+    }
+
+    @keyframes cardIn {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .card-title {
+      font-family: var(--serif);
+      font-size: 22px;
+      letter-spacing: -0.3px;
+      margin-bottom: 4px;
+    }
+
+    .card-sub {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 32px;
+    }
+
+    .required-note {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 28px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .required-note span { color: var(--bad); }
+
+    /* ── FIELD GROUPS ── */
+    .field-group {
+      margin-bottom: 22px;
+    }
+
+    .field-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 7px;
+    }
+
+    label .req { color: var(--bad); margin-left: 2px; }
+    label .opt { color: var(--muted); font-weight: 400; font-size: 12px; margin-left: 4px; }
+
+    .input-wrap {
+      position: relative;
+    }
+
+    .input-wrap .input-icon {
+      position: absolute;
+      left: 13px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--muted);
+      pointer-events: none;
+      font-size: 15px;
+      line-height: 1;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="tel"],
+    textarea {
+      width: 100%;
+      background: var(--off);
+      border: 1.5px solid var(--border);
+      border-radius: 9px;
+      padding: 12px 14px;
+      font-family: var(--sans);
+      font-size: 14px;
+      color: var(--text);
+      outline: none;
+      transition: all 0.15s;
+      -webkit-appearance: none;
+    }
+
+    .has-icon input {
+      padding-left: 40px;
+    }
+
+    input::placeholder, textarea::placeholder { color: var(--border2); }
+
+    input:focus, textarea:focus {
+      border-color: var(--accent);
+      background: var(--white);
+      box-shadow: 0 0 0 3.5px rgba(26,86,219,0.1);
+    }
+
+    input.valid { border-color: var(--good); }
+    input.invalid { border-color: var(--bad); }
+    input.valid:focus { box-shadow: 0 0 0 3.5px rgba(22,163,74,0.1); }
+    input.invalid:focus { box-shadow: 0 0 0 3.5px rgba(220,38,38,0.1); }
+
+    textarea {
+      resize: vertical;
+      min-height: 140px;
+      line-height: 1.6;
+      font-size: 13.5px;
+    }
+
+    .field-hint {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 6px;
+      line-height: 1.5;
+    }
+
+    .char-count {
+      font-size: 11px;
+      color: var(--border2);
+      text-align: right;
+      margin-top: 5px;
+      font-family: var(--mono);
+    }
+
+    .char-count.warn { color: var(--bad); }
+
+    /* ── DIVIDER ── */
+    .section-divider {
+      height: 1px;
+      background: var(--border);
+      margin: 28px 0;
+    }
+
+    .section-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 20px;
+    }
+
+    /* ── SUBMIT ── */
+    .submit-area {
+      margin-top: 32px;
+      padding-top: 24px;
+      border-top: 1px solid var(--border);
+    }
+
+    .submit-notice {
+      font-size: 12.5px;
+      color: var(--muted);
+      line-height: 1.6;
+      margin-bottom: 18px;
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+    }
+
+    .submit-notice svg { flex-shrink: 0; margin-top: 2px; }
+
+    .btn-submit {
+      width: 100%;
+      background: var(--accent);
+      border: none;
+      border-radius: 10px;
+      padding: 15px;
+      font-family: var(--sans);
+      font-size: 15px;
+      font-weight: 600;
+      color: #fff;
+      cursor: pointer;
+      transition: all 0.15s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      letter-spacing: -0.1px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn-submit:hover { background: var(--accent-hover); }
+    .btn-submit:active { transform: scale(0.99); }
+    .btn-submit:disabled { opacity: 0.45; cursor: not-allowed; transform: none; }
+
+    .btn-submit .btn-arrow {
+      font-size: 18px;
+      transition: transform 0.2s;
+    }
+
+    .btn-submit:not(:disabled):hover .btn-arrow { transform: translateX(3px); }
+
+    /* ── STATUS STATES ── */
+    .form-status {
+      margin-top: 16px;
+      border-radius: 9px;
+      padding: 14px 16px;
+      font-size: 13.5px;
+      display: none;
+      align-items: flex-start;
+      gap: 10px;
+      animation: fadeIn 0.25s ease;
+    }
+
+    @keyframes fadeIn { from{opacity:0;transform:translateY(4px)} to{opacity:1;transform:translateY(0)} }
+
+    .form-status.show { display: flex; }
+    .form-status.loading { background: var(--off2); border: 1px solid var(--border); color: var(--text2); }
+    .form-status.success { background: #dcfce7; border: 1px solid #bbf7d0; color: #15803d; }
+    .form-status.error { background: #fee2e2; border: 1px solid #fecaca; color: #b91c1c; }
+    .form-status.warning { background: #fef3c7; border: 1px solid #fde68a; color: #92400e; }
+
+    .status-icon { font-size: 16px; flex-shrink: 0; }
+
+    .status-text { line-height: 1.5; }
+    .status-text strong { display: block; margin-bottom: 2px; }
+
+    /* ── SUCCESS SCREEN ── */
+    #success-screen {
+      display: none;
+      text-align: center;
+      padding: 60px 20px;
+    }
+
+    #success-screen.show { display: block; }
+
+    .success-icon-wrap {
+      width: 72px; height: 72px;
+      background: #dcfce7;
+      border: 2px solid #bbf7d0;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+      margin: 0 auto 20px;
+      animation: popIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    @keyframes popIn {
+      from { transform: scale(0); opacity: 0; }
+      to   { transform: scale(1); opacity: 1; }
+    }
+
+    .success-title {
+      font-family: var(--serif);
+      font-size: 26px;
+      margin-bottom: 10px;
+    }
+
+    .success-sub {
+      font-size: 14px;
+      color: var(--text2);
+      line-height: 1.6;
+      max-width: 340px;
+      margin: 0 auto 28px;
+    }
+
+    .success-score {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--off2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 18px;
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 28px;
+    }
+
+    .success-score .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--good); }
+
+    .btn-dashboard {
+      background: var(--accent);
+      border: none;
+      border-radius: 9px;
+      padding: 12px 28px;
+      font-family: var(--sans);
+      font-size: 14px;
+      font-weight: 600;
+      color: #fff;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: opacity 0.15s;
+    }
+
+    .btn-dashboard:hover { opacity: 0.87; }
+
+    .redirect-note {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 14px;
+    }
+
+    .countdown { font-weight: 700; color: var(--accent); }
+
+    /* ── PROGRESS BAR ── */
+    .progress-bar {
+      height: 3px;
+      background: var(--border);
+      border-radius: 2px;
+      margin-bottom: 28px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: var(--accent);
+      border-radius: 2px;
+      width: 0%;
+      transition: width 0.4s ease;
+    }
+
+    /* ── FOOTER ── */
+    .footer {
+      text-align: center;
+      padding: 24px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 600px) {
+      .form-card { padding: 28px 22px; }
+      .field-row { grid-template-columns: 1fr; }
+      .hero { padding: 36px 20px 32px; }
+    }
+
+    @media (max-width: 420px) {
+      .top-bar { padding: 0 18px; }
+    }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <!-- TOP BAR -->
+  <div class="top-bar">
+    <a href="#" class="brand">
+      <div class="brand-icon">🎯</div>
+      <span class="brand-name">Recruitment Pipeline</span>
+    </a>
+    <a href="interface.html" class="top-bar-link">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+      Recruiter Dashboard
+    </a>
+  </div>
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-eyebrow">
+      <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10"/></svg>
+      Now Accepting Applications
+    </div>
+    <h1 class="hero-title">Join our team.<br><em>Tell us your story.</em></h1>
+    <p class="hero-sub">Submit your profile below. Our system reviews every application and gets back to qualified candidates within 48 hours.</p>
+  </div>
+
+  <!-- FORM WRAPPER -->
+  <div class="form-wrapper">
+    <div class="form-card" id="form-card">
+
+      <!-- Success screen (hidden initially) -->
+      <div id="success-screen">
+        <div class="success-icon-wrap">✓</div>
+        <div class="success-title">Application received!</div>
+        <div class="success-sub">Your profile has been submitted and is being reviewed. We'll be in touch soon.</div>
+        <div class="success-score" id="score-display" style="display:none">
+          <span class="dot"></span>
+          <span id="score-label-text">Score processing…</span>
+        </div>
+        <a href="interface.html" class="btn-dashboard">
+          View Dashboard
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </a>
+        <div class="redirect-note">Redirecting in <span class="countdown" id="countdown">5</span>s…</div>
+      </div>
+
+      <!-- Form (shown initially) -->
+      <div id="form-content">
+        <div class="card-title">Candidate Application</div>
+        <div class="card-sub">AE Assessment · Recruitment Pipeline</div>
+
+        <!-- Progress bar -->
+        <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+
+        <div class="required-note">Fields marked <span>*</span> are required.</div>
+
+        <!-- Personal Information -->
+        <div class="section-label">Personal Information</div>
+
+        <div class="field-row">
+          <div class="field-group">
+            <label for="f-name">Full Name <span class="req">*</span></label>
+            <div class="input-wrap has-icon">
+              <span class="input-icon">👤</span>
+              <input type="text" id="f-name" placeholder="Jane Smith" autocomplete="name" oninput="updateProgress();liveValidate(this,'name')">
+            </div>
+          </div>
+          <div class="field-group">
+            <label for="f-email">Email Address <span class="req">*</span></label>
+            <div class="input-wrap has-icon">
+              <span class="input-icon">✉</span>
+              <input type="email" id="f-email" placeholder="jane@example.com" autocomplete="email" oninput="updateProgress();liveValidate(this,'email')">
+            </div>
+          </div>
+        </div>
+
+        <div class="field-row">
+          <div class="field-group">
+            <label for="f-loc">Location <span class="req">*</span></label>
+            <div class="input-wrap has-icon">
+              <span class="input-icon">📍</span>
+              <input type="text" id="f-loc" placeholder="New York, USA" autocomplete="address-level2" oninput="updateProgress();liveValidate(this,'location')">
+            </div>
+          </div>
+          <div class="field-group">
+            <label for="f-wa">WhatsApp <span class="opt">(optional)</span></label>
+            <div class="input-wrap has-icon">
+              <span class="input-icon">📱</span>
+              <input type="tel" id="f-wa" placeholder="+1 234 567 8900" autocomplete="tel">
+            </div>
+          </div>
+        </div>
+
+        <div class="section-divider"></div>
+        <div class="section-label">Professional Profile</div>
+
+        <div class="field-group">
+          <label for="f-resume">Resume / Profile Summary <span class="req">*</span></label>
+          <textarea
+            id="f-resume"
+            placeholder="Paste your resume, LinkedIn bio, or write a summary of your experience, skills, and what you're looking for. The more detail you provide, the better we can match you to the right role."
+            maxlength="8000"
+            oninput="updateProgress();updateCharCount(this);liveValidate(this,'resume')"
+          ></textarea>
+          <div class="char-count" id="char-count">0 / 8000</div>
+          <div class="field-hint">Include: years of experience, key skills, past roles, seniority level, and any relevant highlights. The system uses AI to extract and score this automatically.</div>
+        </div>
+
+        <!-- Status display -->
+        <div class="form-status" id="form-status">
+          <span class="status-icon" id="status-icon">ℹ</span>
+          <div class="status-text" id="status-text"></div>
+        </div>
+
+        <!-- Submit -->
+        <div class="submit-area">
+          <div class="submit-notice">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            Your information is processed securely and used only for recruitment purposes. We do not share your data with third parties.
+          </div>
+          <button class="btn-submit" id="submit-btn" onclick="submitForm()">
+            Submit Application
+            <span class="btn-arrow">→</span>
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="footer">AE Assessment · Recruitment Pipeline · Powered by n8n + Airtable</div>
+</div>
+
+<script>
+// ── CONFIG ─────────────────────────────────────────────────────────
+const WEBHOOK = 'https://scaletopia.app.n8n.cloud/webhook/candidate-submission';
+const DASHBOARD = 'interface.html';
+
+// Airtable fallback (if webhook unavailable)
+const AT_TOKEN   = 'patAhuOMJFhzDO0EG.22a0e3537181b8f539dd0d8ed386ee2b873bf703d63bf6e15eb664fc3900d215';
+const AT_BASE    = 'appbQoUvQTAIzZftB';
+const AT_TABLE   = 'tbliOOrhD83eiWonI';
+
+// ── LIVE VALIDATION ─────────────────────────────────────────────────
+function liveValidate(el, type) {
+  const val = el.value.trim();
+  el.classList.remove('valid','invalid');
+  if (!val) return;
+  if (type === 'email') {
+    const ok = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val);
+    el.classList.add(ok ? 'valid' : 'invalid');
+  } else if (type === 'resume') {
+    el.classList.add(val.length >= 30 ? 'valid' : 'invalid');
+  } else {
+    el.classList.add(val.length >= 2 ? 'valid' : 'invalid');
+  }
+}
+
+// ── CHAR COUNT ──────────────────────────────────────────────────────
+function updateCharCount(el) {
+  const c = document.getElementById('char-count');
+  const len = el.value.length;
+  c.textContent = `${len.toLocaleString()} / 8,000`;
+  c.className = 'char-count' + (len > 7000 ? ' warn' : '');
+}
+
+// ── PROGRESS BAR ────────────────────────────────────────────────────
+function updateProgress() {
+  const fields = [
+    document.getElementById('f-name').value.trim(),
+    document.getElementById('f-email').value.trim(),
+    document.getElementById('f-loc').value.trim(),
+    document.getElementById('f-resume').value.trim()
+  ];
+  const filled = fields.filter(v => v.length > 0).length;
+  document.getElementById('progress').style.width = `${(filled / fields.length) * 100}%`;
+}
+
+// ── STATUS DISPLAY ──────────────────────────────────────────────────
+function showStatus(type, icon, title, body) {
+  const el = document.getElementById('form-status');
+  const iconEl = document.getElementById('status-icon');
+  const textEl = document.getElementById('status-text');
+  el.className = `form-status show ${type}`;
+  iconEl.textContent = icon;
+  textEl.innerHTML = `<strong>${title}</strong>${body ? body : ''}`;
+}
+
+function hideStatus() {
+  document.getElementById('form-status').className = 'form-status';
+}
+
+// ── SUBMIT ──────────────────────────────────────────────────────────
+async function submitForm() {
+  const name   = document.getElementById('f-name').value.trim();
+  const email  = document.getElementById('f-email').value.trim();
+  const loc    = document.getElementById('f-loc').value.trim();
+  const resume = document.getElementById('f-resume').value.trim();
+  const wa     = document.getElementById('f-wa').value.trim();
+  const btn    = document.getElementById('submit-btn');
+
+  // Client-side validation
+  const errors = [];
+  if (!name)   errors.push('Full Name');
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) errors.push('valid Email');
+  if (!loc)    errors.push('Location');
+  if (!resume || resume.length < 30) errors.push('Profile Summary (min 30 chars)');
+
+  if (errors.length) {
+    showStatus('error','⚠','Please fix the following:', `<br>Missing: ${errors.join(', ')}`);
+    // Shake invalid fields
+    ['f-name','f-email','f-loc','f-resume'].forEach(id => {
+      const el = document.getElementById(id);
+      if (!el.value.trim()) { el.classList.add('invalid'); el.focus(); }
+    });
+    return;
+  }
+
+  btn.disabled = true;
+  btn.innerHTML = `<div class="spinner-sm"></div>Submitting…`;
+  showStatus('loading','⏳','Submitting your application…','Processing through our pipeline. This takes a few seconds.');
+
+  const payload = {
+    name, email,
+    location: loc,
+    resume,
+    whatsapp: wa,
+    dateSubmitted: new Date().toISOString()
+  };
+
+  let score = null;
+
+  try {
+    // Try n8n webhook first
+    const res = await fetch(WEBHOOK, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+
+    let data = {};
+    try { data = await res.json(); } catch(e) {}
+
+    if (res.ok && data.success !== false) {
+      score = data.score || null;
+      showSuccess(name, score);
+    } else {
+      throw new Error(data.error || data.message || `HTTP ${res.status}`);
+    }
+  } catch(e) {
+    // Fallback: write directly to Airtable
+    showStatus('warning','⚙','n8n pipeline unavailable — saving directly…','Your data will be stored without AI scoring.');
+    try {
+      await fetch(`https://api.airtable.com/v0/${AT_BASE}/${AT_TABLE}`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${AT_TOKEN}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          fields: {
+            'Name': name, 'Email': email, 'Location': loc,
+            'Resume': resume, 'WhatsApp': wa,
+            'Date Submitted': new Date().toISOString(),
+            'Score': 'Maybe', 'Score (Numeric)': 0, 'Status': 'New'
+          }
+        })
+      });
+      showSuccess(name, 'Pending (AI offline)');
+    } catch(e2) {
+      showStatus('error','✗','Submission failed',`<br>${e2.message}<br>Please try again or email us directly.`);
+      btn.disabled = false;
+      btn.innerHTML = `Submit Application <span class="btn-arrow">→</span>`;
+    }
+  }
+}
+
+// ── SUCCESS ─────────────────────────────────────────────────────────
+function showSuccess(name, score) {
+  document.getElementById('form-content').style.display = 'none';
+  const ss = document.getElementById('success-screen');
+  ss.classList.add('show');
+
+  if (score) {
+    const sd = document.getElementById('score-display');
+    const sl = document.getElementById('score-label-text');
+    sd.style.display = 'inline-flex';
+    sl.textContent = `AI Score: ${score}`;
+    // Color the dot
+    const dot = sd.querySelector('.dot');
+    if (score === 'Good Fit') dot.style.background = '#16a34a';
+    else if (score === 'Maybe') dot.style.background = '#b45309';
+    else dot.style.background = '#dc2626';
+  }
+
+  // Countdown redirect
+  let count = 5;
+  const el = document.getElementById('countdown');
+  const timer = setInterval(() => {
+    count--;
+    el.textContent = count;
+    if (count <= 0) {
+      clearInterval(timer);
+      window.location.href = DASHBOARD;
+    }
+  }, 1000);
+}
+
+// ── SPINNER STYLE (inline) ──────────────────────────────────────────
+const style = document.createElement('style');
+style.textContent = `
+  .spinner-sm {
+    width: 16px; height: 16px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+    flex-shrink: 0;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+`;
+document.head.appendChild(style);
+</script>
+</body>
+</html>
